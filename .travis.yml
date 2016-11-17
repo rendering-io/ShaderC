@@ -1,21 +1,5 @@
 language: cpp
 
-compiler:  
-  - gcc
-  - clang
-
-os:
-  - linux
-#  - osx
-
-addons:
-  apt:
-    sources:
-      - george-edison55-precise-backports
-    packages:
-      - cmake-data
-      - cmake
-
 matrix:
   include:
     - os: linux
@@ -23,10 +7,13 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - george-edison55-precise-backports
           packages:
-            - g++-4.9
+            - g++-6
+            - cmake-data
+            - cmake
       env:
-        - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
 
 before_install:
   - eval "${MATRIX_EVAL}"
