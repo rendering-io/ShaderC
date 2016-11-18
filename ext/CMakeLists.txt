@@ -45,5 +45,3 @@ set_target_properties(GMock PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES ${source_dir}/googlemock/include
   INTERFACE_LINK_LIBRARIES "GMockLibrary;GTest"
 )
-add_dependencies(GTest GTestLibrary)
-add_dependencies(GMock GMockLibrary)
