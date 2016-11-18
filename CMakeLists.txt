@@ -1,6 +1,9 @@
 # Set the minimum required CMake version.
 cmake_minimum_required(VERSION 3.2)
 
+# Enable unit testing via ctest.
+enable_testing()
+
 # Set global compiler options.
 add_compile_options(-std=c++14)
 
