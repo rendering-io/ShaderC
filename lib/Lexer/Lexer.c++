@@ -64,6 +64,7 @@ Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
   // If the character is alphabetic, then we are starting a keyword or 
   // identifier.
   if (isAlphabetic(c)) {
+    lexme_.push_back(c);
     advance(1);
     return ParseState::IDENTIFIER;  
   }
@@ -84,6 +85,7 @@ Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   // If the character is alphabetic, then we are extending a keyword or 
   // identifier.
   if (isAlphabetic(c)) {
+    lexme_.push_back(c);
     advance(1);
     return ParseState::IDENTIFIER;  
   }
@@ -92,7 +94,10 @@ Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   // identifier. We should push the identifier to the token list and then 
   // return. We don't advance, because we need the invalid character to be 
   // consumed by a state that can handle it.
-  tokens.emplace_back();
+  lexme_.push_back(0);
+  tokens.emplace_back(lexme_.data());
+  lexme_.clear();
+  
   return ParseState::INITIAL;
 }
 

@@ -5,21 +5,24 @@
 #include <cstring>
 #include <iostream>
 #include <list>
-#include <memory>
 #include <string>
+#include <vector>
 
 namespace shaderc {
 
 // Represents a single token in our shader language.
 class Token {
+public:
+  Token(std::string lexme) : lexme_{lexme} { }
+  const std::string& lexme() const { return lexme_; }
 private:
-  std::unique_ptr<char[]> lexme_;
+  std::string lexme_;
 
   friend std::ostream & operator<<(std::ostream &os, const Token& t);
 };
 
 inline std::ostream & operator<<(std::ostream &os, const Token& t) {
-  return os << "<,>";
+  return os << "<" << "," << t.lexme() << ">";
 }
 
 // A list of tokens.
@@ -68,6 +71,9 @@ private:
   char lookahead(size_t n = 1) { 
     return head_ + n < end_ ? *(head_ + n) : 0;
   }
+
+  // A buffer to accumulate the lexme into.
+  std::vector<char> lexme_;
 
   // The current head of the current parse string.
   const char *head_;
