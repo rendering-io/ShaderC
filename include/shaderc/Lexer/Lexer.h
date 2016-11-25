@@ -4,12 +4,14 @@
 #include <cstddef>
 #include <cstring>
 #include <list>
+#include <memory>
 
 namespace shaderc {
 
 // Represents a single token in our shader language.
 class Token {
 private:
+  std::unique_ptr<char[]> lexme_;
 };
 
 // A list of tokens.
@@ -34,14 +36,23 @@ public:
 
 private:
   void advance(size_t n) { head_ += n; }
-  bool consume();
+  bool consume(TokenList&);
+
+  // Consume the next character, assuming that it is a brace, bracket or 
+  // parentheses.
+  ParseState consumeBracket(TokenList&);
 
   // Consume the next character, assuming we are in the initial parse state.
-  ParseState consumeInitial();
+  ParseState consumeInitial(TokenList&);
+
+  // Consume the next character, assuming we are in the identifier parse state.
+  ParseState consumeIdentifier(TokenList&);
 
   bool done() { return head_ >= end_; };
   bool isLineEnding(char c) { return c == '\n' || c == '\r'; }
   bool isAlphabetic(char c) const;
+  bool isBracket(char c) const;
+  bool isDigit(char c) const;
   bool isWhitespace(char c) const;
   void reset(const char *input, size_t size);
   char head() { return *head_; }
