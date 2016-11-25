@@ -3,8 +3,10 @@
 
 #include <cstddef>
 #include <cstring>
+#include <iostream>
 #include <list>
 #include <memory>
+#include <string>
 
 namespace shaderc {
 
@@ -12,7 +14,13 @@ namespace shaderc {
 class Token {
 private:
   std::unique_ptr<char[]> lexme_;
+
+  friend std::ostream & operator<<(std::ostream &os, const Token& t);
 };
+
+inline std::ostream & operator<<(std::ostream &os, const Token& t) {
+  return os << "<,>";
+}
 
 // A list of tokens.
 using TokenList = std::list<Token>;
@@ -31,6 +39,7 @@ private:
   };
 public:
   // Parses an input string into a a sequence of words/tokens.
+  TokenList parse(const std::string& in) { return parse(in.c_str(), in.size()); }
   TokenList parse(const char *in) { return parse(in, std::strlen(in)); }
   TokenList parse(const char *in, size_t size);
 
