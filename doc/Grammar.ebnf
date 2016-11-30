@@ -1,0 +1,25 @@
+(* This file details the grammar currently supported by the parser. Its 
+  extremely simple, to the point of not being useful for anything, but acts as a
+  reference for what is currently implemented. *)
+
+(* A module consists of 0 or more global values. *)
+module 
+  = { global value } ;
+
+(* For now global values may only be functions. In future we should also expect
+  types, constants and global variables. *)
+global value
+  = function ;
+
+(* A function always begins with 'fn', has a name, a parameter list and a body.
+  We should also expect optional return types in future. *)
+function
+  = "fn" , identifer , parameter list , function body ;
+
+(* For now, parameter lists are always empty. *)
+parameter list
+  = "(" , ")" ;
+
+(* For now, function bodies are always empty. *)
+function body
+  = "{" , "}" ;
