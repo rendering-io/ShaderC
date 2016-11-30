@@ -13,17 +13,27 @@ namespace shaderc {
 // Represents a single token in our shader language.
 class Token {
 public:
-  Token(std::string lexme) : lexme_{lexme} { }
+  enum class Type {
+    KEYWORD,
+    IDENTIFIER,
+    LBRACKET,
+    RBRACKET,
+    LBRACE,
+    RBRACE,
+    LPAREN,
+    RPAREN,
+  };
+  Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
+  
   const std::string& lexme() const { return lexme_; }
+  Type type() const { return type_; }
+
 private:
   std::string lexme_;
+  Type type_;
 
   friend std::ostream & operator<<(std::ostream &os, const Token& t);
 };
-
-inline std::ostream & operator<<(std::ostream &os, const Token& t) {
-  return os << "<" << "," << t.lexme() << ">";
-}
 
 // A list of tokens.
 using TokenList = std::list<Token>;

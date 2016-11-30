@@ -1,6 +1,28 @@
 #include <shaderc/Lexer/Lexer.h>
 #include <cassert>
 
+namespace shaderc {
+
+std::ostream & operator<<(std::ostream &os, const Token& t) {
+  std::string typeStr;
+  switch (t.type_) {
+  case Token::Type::IDENTIFIER: typeStr = "IDENTIFIER"; break;
+  case Token::Type::KEYWORD:    typeStr = "KEYWORD";    break;
+  case Token::Type::LBRACKET:   typeStr = "LBRACKET";   break;
+  case Token::Type::RBRACKET:   typeStr = "RBRACKET";   break;
+  case Token::Type::LBRACE:     typeStr = "LBRACE";     break;
+  case Token::Type::RBRACE:     typeStr = "RBRACE";     break;
+  case Token::Type::LPAREN:     typeStr = "LPAREN";     break;
+  case Token::Type::RPAREN:     typeStr = "RPAREN";     break;
+  default:
+    assert(false && "Unsupported token type.");
+  }
+
+  return os << "<" << typeStr << "," << t.lexme() << ">";
+}
+
+}
+
 using namespace shaderc;
 
 void Lexer::reset(const char *input, size_t size) {
@@ -28,23 +50,45 @@ bool Lexer::consume(TokenList& tokens) {
   return !done();
 }
 
-Lexer::ParseState Lexer::consumeBracket(TokenList&) {
+Lexer::ParseState Lexer::consumeBracket(TokenList& tokens) {
   assert(ParseState::INITIAL == parse_state_);
 
   // Get the current character.
   char c = head();
+  assert(isBracket(c));
+
+  Token::Type type;
   switch (c) {
   case '[':
+    type = Token::Type::LBRACKET; 
+    break;
   case ']':
+    type = Token::Type::RBRACKET; 
+    break;
   case '{':
+    type = Token::Type::LBRACE; 
+    break;
   case '}':
+    type = Token::Type::RBRACE; 
+    break;
   case '(':
+    type = Token::Type::LPAREN; 
+    break;
   case ')':
-    return ParseState::INITIAL;
+    type = Token::Type::RPAREN; 
+    break;
 
   default:
     assert(false);
+    return ParseState::INVALID;
   }
+
+  lexme_.push_back(c);
+  lexme_.push_back(0);
+  tokens.emplace_back(type, lexme_.data());
+  lexme_.clear();
+  advance(1);
+  return ParseState::INITIAL;
 }
 
 // Consume the next character, assuming we are in the initial parse state.
@@ -95,7 +139,7 @@ Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   // return. We don't advance, because we need the invalid character to be 
   // consumed by a state that can handle it.
   lexme_.push_back(0);
-  tokens.emplace_back(lexme_.data());
+  tokens.emplace_back(Token::Type::IDENTIFIER, lexme_.data());
   lexme_.clear();
   
   return ParseState::INITIAL;
