@@ -14,6 +14,7 @@ namespace shaderc {
 class Token {
 public:
   enum class Type {
+    INVALID,
     KEYWORD,
     IDENTIFIER,
     LBRACKET,
@@ -23,6 +24,7 @@ public:
     LPAREN,
     RPAREN,
   };
+  Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
   
   const std::string& lexme() const { return lexme_; }
