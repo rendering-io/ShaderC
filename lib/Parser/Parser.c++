@@ -64,59 +64,47 @@ Token Parser::consumeRBrace() {
 	return consumeToken(Token::Type::RBRACE, nullptr);
 }
 
-ParseNodePtr Parser::makeNode() {
-  return std::make_unique<ParseNode>();
-}
-
-ParseNodePtr Parser::makeNode(Token token) {
-  return std::make_unique<ParseNode>(std::move(token));
-}
-
-ParseNodePtr Parser::parseModule() {
-  ParseNodePtr module = makeNode();
+TranslationUnitPtr Parser::parseModule() {
+  TranslationUnitPtr module = std::make_unique<TranslationUnit>();
   while (tokensRemaining()) {
-    ParseNodePtr value = parseGlobalValue();
+    auto value = parseGlobalDecl();
     module->append(std::move(value));
   }
 
   return module;
 }
 
-ParseNodePtr Parser::parseGlobalValue() {
+GlobalDeclPtr Parser::parseGlobalDecl() {
   Token& token = head();
   if (isKeyword(token, "fn")) {
-    return parseFunction();
+    return parseFunctionDecl();
   } else {
     // We found an unexpected and unsupported token.
     throw ParseError{};
   }
 }
 
-ParseNodePtr Parser::parseFunction() {
+FunctionDeclPtr Parser::parseFunctionDecl() {
   // Require that the first token is 'fn' keyword.
   consumeKeyword("fn");
 
-  ParseNodePtr function = makeNode();
+  auto function = std::make_unique<FunctionDecl>();
 
   // Get the function name.
   Token name = consumeIdentifier();
-  ParseNodePtr function_name = makeNode(name);
-  function->append(parseParameterList());
-  function->append(parseFunctionBody());
+  //ParseNodePtr function_name = makeNode(name);
+  parseParameterList();
+  parseFunctionBody();
 
   return function;
 }
 
-ParseNodePtr Parser::parseParameterList() {
-  ParseNodePtr params = makeNode();
+void Parser::parseParameterList() {
   consumeLParen();
   consumeRParen();
-  return params;
 }
 
-ParseNodePtr Parser::parseFunctionBody() {
-  ParseNodePtr body = makeNode();
+void Parser::parseFunctionBody() {
   consumeLBrace();
   consumeRBrace();
-  return body;
 }
