@@ -31,6 +31,17 @@ void Lexer::reset(const char *input, size_t size) {
   parse_state_ = ParseState::INITIAL;
 }
 
+void Lexer::emitToken(TokenList& tokens, Token::Type type) {
+  // Null terminate the lexme.
+  lexme_.push_back(0);
+
+  // Emit a token.
+  tokens.emplace_back(type, lexme_.data());
+
+  // Clear the lexme ready for the next token.
+  lexme_.clear();  
+}
+
 bool Lexer::consume(TokenList& tokens) {
   ParseState next_state;
   switch (parse_state_) {
@@ -47,6 +58,11 @@ bool Lexer::consume(TokenList& tokens) {
   }
 
   parse_state_ = next_state;
+
+  bool end = done();
+  if (end) {
+
+  }
   return !done();
 }
 
@@ -84,9 +100,7 @@ Lexer::ParseState Lexer::consumeBracket(TokenList& tokens) {
   }
 
   lexme_.push_back(c);
-  lexme_.push_back(0);
-  tokens.emplace_back(type, lexme_.data());
-  lexme_.clear();
+  emitToken(tokens, type);
   advance(1);
   return ParseState::INITIAL;
 }
@@ -95,8 +109,9 @@ Lexer::ParseState Lexer::consumeBracket(TokenList& tokens) {
 Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
   assert(ParseState::INITIAL == parse_state_);
 
-  // Get the current character.
+  // Get the current and next character.
   char c = head();
+  char n = lookahead(1);
 
   // If the character is whitespace then consume it, and return in initial 
   // state again.
@@ -110,6 +125,13 @@ Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
   if (isAlphabetic(c)) {
     lexme_.push_back(c);
     advance(1);
+
+    // If the next character is not a valid in an identifier, then emit a 1 
+    // character identifier.
+    if (!isAlphabetic(n)) {
+      emitToken(tokens, Token::Type::IDENTIFIER);
+      return ParseState::INITIAL;   
+    }
     return ParseState::IDENTIFIER;  
   }
 
@@ -123,25 +145,28 @@ Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
 Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   assert(ParseState::IDENTIFIER == parse_state_);
 
-  // Get the current character.
+  // Get the current and next character.
   char c = head();
+  char n = lookahead(1);
 
   // If the character is alphabetic, then we are extending a keyword or 
   // identifier.
   if (isAlphabetic(c)) {
     lexme_.push_back(c);
     advance(1);
-    return ParseState::IDENTIFIER;  
+
+    // Now we lookahead to the next character. If its also alphabetic then we 
+    // continue parsing an identifier.
+    if (isAlphabetic(n))
+      return ParseState::IDENTIFIER;  
   }
 
   // If we reach this point, then we have a character that isn't valid in an
   // identifier. We should push the identifier to the token list and then 
   // return. We don't advance, because we need the invalid character to be 
   // consumed by a state that can handle it.
-  lexme_.push_back(0);
-  tokens.emplace_back(Token::Type::IDENTIFIER, lexme_.data());
-  lexme_.clear();
-  
+  emitToken(tokens, Token::Type::IDENTIFIER);
+
   return ParseState::INITIAL;
 }
 

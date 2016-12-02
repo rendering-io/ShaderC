@@ -32,3 +32,15 @@ TEST(Lexer, Parse_TwoIdentifiers_ReturnsTwoIdentiferTokenList) {
   auto tok = lexer.parse(" x y ");
   EXPECT_EQ(2, tok.size());
 }
+
+TEST(Lexer, Parse_SingleCharacterIdentifierWithoutWhitespace_ReturnsSingleIdentiferTokenList) {
+  Lexer lexer;
+  auto tok = lexer.parse("x");
+  EXPECT_EQ(1, tok.size());
+}
+
+TEST(Lexer, Parse_SingleIdentifierWithoutWhitespace_ReturnsSingleIdentiferTokenList) {
+  Lexer lexer;
+  auto tok = lexer.parse("xx");
+  EXPECT_EQ(1, tok.size());
+}
