@@ -35,6 +35,12 @@ void Lexer::emitToken(TokenList& tokens, Token::Type type) {
   // Null terminate the lexme.
   lexme_.push_back(0);
 
+  // Hack 'fn' identifier into a keyword. This should be replaced by a proper
+  // symbol table.
+  if (Token::Type::IDENTIFIER == type &&
+      std::string("fn") == lexme_.data())
+    type = Token::Type::KEYWORD;
+  
   // Emit a token.
   tokens.emplace_back(type, lexme_.data());
 

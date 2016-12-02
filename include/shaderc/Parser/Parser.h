@@ -12,7 +12,7 @@ class ParseError : std::exception { };
 class Parser {
 public:
   Parser();
-  void parse(TokenList& tokens);
+  TranslationUnitPtr parse(TokenList& tokens);
   
 private:
   bool tokensRemaining() const;

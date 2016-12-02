@@ -1,4 +1,5 @@
 ##
 # lib/AST/CMakeLists.txt
 #
-add_library(AST AST.c++)
+add_library(AST AST.c++
+                ASTPrettyPrinter.c++)

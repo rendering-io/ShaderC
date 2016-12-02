@@ -43,6 +43,8 @@ using TranslationUnitPtr = std::unique_ptr<TranslationUnit>;
 
 class ASTVisitor {
 public:
+  void visitAll(ASTNode&);
+  
   virtual void visit(TranslationUnit&) = 0;
   virtual void visit(FunctionDecl&) = 0;
 };

@@ -62,6 +62,7 @@ private:
   void advance(size_t n) { head_ += n; }
   bool consume(TokenList&);
   void emitToken(TokenList& tokens, Token::Type type);
+  void emitKeywordOrIdentifier(TokenList& tokens);
 
   // Consume the next character, assuming that it is a brace, bracket or 
   // parentheses.

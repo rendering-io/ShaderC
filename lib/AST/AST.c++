@@ -2,6 +2,10 @@
 
 using namespace shaderc;
 
+void ASTVisitor::visitAll(ASTNode& node) {
+  node.accept(*this);
+}
+
 void FunctionDecl::accept(ASTVisitor& visitor) {
   visitor.visit(*this); 
 }

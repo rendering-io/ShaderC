@@ -6,10 +6,10 @@ Parser::Parser() : tokens_{nullptr} {
 	
 }
 
-void Parser::parse(TokenList& tokens) {
+TranslationUnitPtr Parser::parse(TokenList& tokens) {
 	tokens_ = &tokens;
 
-	parseModule();
+	return parseModule();
 }
 
 bool Parser::tokensRemaining() const {

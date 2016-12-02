@@ -1,4 +1,6 @@
+#include <shaderc/AST/ASTPrettyPrinter.h>
 #include <shaderc/Lexer/Lexer.h>
+#include <shaderc/Parser/Parser.h>
 #include <fstream>
 #include <iostream>
 
@@ -43,6 +45,12 @@ int main(int argc, char *argv[]) {
       std::cout << token << '\n';
     }
 
+    // Parse our token stream.
+    Parser parser;
+    TranslationUnitPtr module = parser.parse(tokens);
+
+    ASTPrettyPrinter printer{std::cout};
+    printer.print(*module);
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return -1;
