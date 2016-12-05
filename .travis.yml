@@ -29,6 +29,8 @@ install:
 before_script:
   - git clone https://github.com/rendering-io/LLVM.git LLVM
   - ln -s . LLVM/projects/ShaderC
+  - pwd
+  - ls -la
   - mkdir build
   - cd build
   - cmake -DLLVM_TARGETS_TO_BUILD=X86 ../LLVM
