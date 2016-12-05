@@ -21,16 +21,18 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 install:
+# Shuffle the ShaderC git repo into a temporary hidden folder.
+  - mkdir .tmp
+  - mv * .tmp
 # Install a newer version of CMake for our Linux environment. 
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then wget --no-check-certificate http://cmake.org/files/v3.7/cmake-3.7.1-Linux-x86_64.tar.gz   ;fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xzf cmake-3.7.1-Linux-x86_64.tar.gz                                                  ;fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$PWD/cmake-3.7.1-Linux-x86_64/bin:$PATH                                       ;fi
 
 before_script:
-  - mkdir .ShaderC
-  - mv * .ShaderC
   - git clone https://github.com/rendering-io/LLVM.git LLVM
-  - mv .ShaderC LLVM/projects/ShaderC
+# Now move ShaderC into the LLVM tree
+  - mv .tmp LLVM/projects/ShaderC
   - mkdir build
   - cd build
   - cmake -DLLVM_TARGETS_TO_BUILD=X86 ../LLVM
