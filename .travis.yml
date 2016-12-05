@@ -27,10 +27,10 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then export PATH=$PWD/cmake-3.7.1-Linux-x86_64/bin:$PATH                                       ;fi
 
 before_script:
+  - mkdir .ShaderC
+  - mv * .ShaderC
   - git clone https://github.com/rendering-io/LLVM.git LLVM
-  - ln -s . LLVM/projects/ShaderC
-  - pwd
-  - ls -la
+  - mv .ShaderC LLVM/projects/ShaderC
   - mkdir build
   - cd build
   - cmake -DLLVM_TARGETS_TO_BUILD=X86 ../LLVM
