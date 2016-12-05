@@ -29,6 +29,6 @@ before_script:
   - ln -s . LLVM/projects/ShaderC
   - mkdir build
   - cd build
-  - cmake ../LLVM
+  - cmake -DLLVM_TARGETS_TO_BUILD=X86 ../LLVM
 
-script: make 
+script: make -j 4
