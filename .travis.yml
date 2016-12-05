@@ -33,4 +33,4 @@ before_script:
   - cd build
   - cmake -DLLVM_TARGETS_TO_BUILD=X86 ../LLVM
 
-script: make -j 4
+script: make -j 4 shaderc
