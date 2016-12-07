@@ -27,20 +27,7 @@ std::string readSourceFile(const char* path) {
 
   return contents;
 }
-/*
-void doCodeGen(const TranslationUnitPtr& AST) {
-  using namespace llvm;
 
-  // Initialize LLVM by creating a context.
-  LLVMContext context;
-  llvm_shutdown_obj cleanup;  // Call llvm_shutdown() on exit.
-
-  // Create an LLVM module.
-  Module module{"shader", context};
-
-c  module.dump();
-}
-*/
 int main(int argc, char *argv[]) {
   // Disable syncing between stdio and iostreams.
   std::ios::sync_with_stdio(false);
