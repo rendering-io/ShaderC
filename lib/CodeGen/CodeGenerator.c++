@@ -3,11 +3,17 @@
 #include <shaderc/CodeGen/IRModule.h>
 #include <shaderc/Support/Context.h>
 #include <llvm/IR/Module.h>
-
+#include <llvm/Support/raw_ostream.h>
 namespace shaderc {
 
 class LLVMIRModule : public IRModule {
 public:
+  LLVMIRModule(Context&, const char*);
+
+  operator llvm::Module*();
+
+  void print(std::ostream&) override;
+
   llvm::Module module_;
 };
 
@@ -18,12 +24,32 @@ public:
   void visit(FunctionDecl&) override;
 private:
   Context &ctx_;
-  std::unique_ptr<llvm::Module> module_;
+  std::unique_ptr<LLVMIRModule> module_;
+
+  friend class CodeGenerator;
 };
 
 }
 
 using namespace shaderc;
+
+IRModule::~IRModule(){}
+
+LLVMIRModule::LLVMIRModule(Context& ctx, const char* name)
+: module_{name, ctx.getLLVMContext()} {
+
+}
+
+void LLVMIRModule::print(std::ostream& out) {
+  std::string storage;
+  llvm::raw_string_ostream os{storage};
+  module_.print(os, nullptr);
+  out << os.str();
+}
+
+LLVMIRModule::operator llvm::Module*() {
+  return &module_;
+}
 
 CodeGenerator::CodeGenerator(Context &ctx)
 : impl_{std::make_unique<CodeGeneratorImpl>(ctx)} {
@@ -34,15 +60,14 @@ CodeGenerator::~CodeGenerator() {
 }
 
 std::unique_ptr<IRModule> CodeGenerator::buildIRModule(TranslationUnit &module) {
-  impl_->visit(module);
-  return std::make_unique<IRModule>();
+  impl_->visitAll(module);
+  return std::move(impl_->module_);
 }
 
 CodeGeneratorImpl::CodeGeneratorImpl(Context &ctx) : ctx_{ctx} { }
 
 void CodeGeneratorImpl::visit(TranslationUnit& module) {
-  module_ = std::make_unique<llvm::Module>("unamed"/*module.name()*/,
-                                           ctx_.getLLVMContext());
+  module_ = std::make_unique<LLVMIRModule>(ctx_, "unamed"/*module.name()*/);
 }
 
 void CodeGeneratorImpl::visit(FunctionDecl& decl) {
@@ -58,6 +83,6 @@ void CodeGeneratorImpl::visit(FunctionDecl& decl) {
 
   // Now add a function to our module.
   auto *func = Function::Create(funcType, GlobalValue::ExternalLinkage,
-                                "name", module_.get());
+                                "name", *module_);
 
 }

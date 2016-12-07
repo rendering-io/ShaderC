@@ -49,16 +49,20 @@ int main(int argc, char *argv[]) {
       std::cout << token << '\n';
     }
 
+    std::cout << '\n';
+
     // Parse our token stream.
     Parser parser;
     TranslationUnitPtr module = parser.parse(tokens);
 
     ASTPrettyPrinter printer{std::cout};
     printer.print(*module);
-    //doCodeGen(module);
+
+    std::cout << '\n';
 
     CodeGenerator generator{ctx};
     auto irModule = generator.buildIRModule(*module);
+    irModule->print(std::cout);
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return -1;
