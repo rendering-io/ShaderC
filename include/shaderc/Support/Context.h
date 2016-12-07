@@ -3,11 +3,17 @@
 
 #include <memory>
 
+namespace llvm { class LLVMContext; }
+
 namespace shaderc {
 
 // Compiler context object which manages global state.
 class Context {
 public:
+  Context();
+  ~Context();
+  
+  llvm::LLVMContext& getLLVMContext();
 private:
   class State;
   std::unique_ptr<State> impl_;

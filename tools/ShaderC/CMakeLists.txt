@@ -4,4 +4,4 @@
 
 # Add ShaderC compiler executable.
 add_executable(shaderc ShaderC.c++)
-target_link_libraries(shaderc PUBLIC Lexer Parser)
+target_link_libraries(shaderc PUBLIC Lexer Parser CodeGen LLVMCore)

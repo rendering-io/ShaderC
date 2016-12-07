@@ -1,6 +1,9 @@
 #include <shaderc/AST/ASTPrettyPrinter.h>
+#include <shaderc/CodeGen/CodeGenerator.h>
+#include <shaderc/CodeGen/IRModule.h>
 #include <shaderc/Lexer/Lexer.h>
 #include <shaderc/Parser/Parser.h>
+#include <shaderc/Support/Context.h>
 #include <fstream>
 #include <iostream>
 
@@ -24,11 +27,25 @@ std::string readSourceFile(const char* path) {
 
   return contents;
 }
+/*
+void doCodeGen(const TranslationUnitPtr& AST) {
+  using namespace llvm;
 
+  // Initialize LLVM by creating a context.
+  LLVMContext context;
+  llvm_shutdown_obj cleanup;  // Call llvm_shutdown() on exit.
+
+  // Create an LLVM module.
+  Module module{"shader", context};
+
+c  module.dump();
+}
+*/
 int main(int argc, char *argv[]) {
   // Disable syncing between stdio and iostreams.
   std::ios::sync_with_stdio(false);
 
+  Context ctx;
   try {
     if (1 >= argc)
       return -1;
@@ -51,6 +68,10 @@ int main(int argc, char *argv[]) {
 
     ASTPrettyPrinter printer{std::cout};
     printer.print(*module);
+    //doCodeGen(module);
+
+    CodeGenerator generator{ctx};
+    auto irModule = generator.buildIRModule(*module);
   } catch (std::exception& e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return -1;
