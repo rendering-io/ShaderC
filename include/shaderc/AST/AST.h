@@ -3,6 +3,7 @@
 
 #include <list>
 #include <memory>
+#include <string>
 
 namespace shaderc {
 
@@ -24,7 +25,12 @@ using GlobalDeclPtr = std::unique_ptr<GlobalDecl>;
 
 class FunctionDecl : public GlobalDecl {
 public:
+  FunctionDecl(std::string name) :name_{name} { }
   void accept(ASTVisitor& visitor) override;
+
+  const char* name() const { return name_.c_str(); }
+private:
+  std::string name_;
 };
 
 using FunctionDeclPtr = std::unique_ptr<FunctionDecl>;

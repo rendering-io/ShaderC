@@ -88,10 +88,11 @@ FunctionDeclPtr Parser::parseFunctionDecl() {
   // Require that the first token is 'fn' keyword.
   consumeKeyword("fn");
 
-  auto function = std::make_unique<FunctionDecl>();
-
   // Get the function name.
   Token name = consumeIdentifier();
+
+  auto function = std::make_unique<FunctionDecl>(name.lexme());
+
   //ParseNodePtr function_name = makeNode(name);
   parseParameterList();
   parseFunctionBody();

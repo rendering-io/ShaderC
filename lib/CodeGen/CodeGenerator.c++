@@ -83,6 +83,6 @@ void CodeGeneratorImpl::visit(FunctionDecl& decl) {
 
   // Now add a function to our module.
   auto *func = Function::Create(funcType, GlobalValue::ExternalLinkage,
-                                "name", *module_);
+                                decl.name(), *module_);
 
 }
