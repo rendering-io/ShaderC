@@ -23,6 +23,9 @@ public:
     RBRACE,
     LPAREN,
     RPAREN,
+    COLON,
+    TERMINATOR,
+    RARROW,
   };
   Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
