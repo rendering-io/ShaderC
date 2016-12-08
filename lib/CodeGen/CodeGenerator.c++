@@ -2,8 +2,11 @@
 #include <shaderc/CodeGen/CodeGenerator.h>
 #include <shaderc/CodeGen/IRModule.h>
 #include <shaderc/Support/Context.h>
+#include <llvm/IR/BasicBlock.h>
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/raw_ostream.h>
+
 namespace shaderc {
 
 class LLVMIRModule : public IRModule {
@@ -85,4 +88,7 @@ void CodeGeneratorImpl::visit(FunctionDecl& decl) {
   auto *func = Function::Create(funcType, GlobalValue::ExternalLinkage,
                                 decl.name(), *module_);
 
+  // Add a first basic block.
+  BasicBlock* block = BasicBlock::Create(ctx, "entry", func);
+  IRBuilder<> builder(block);
 }
