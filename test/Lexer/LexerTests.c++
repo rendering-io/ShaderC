@@ -44,3 +44,10 @@ TEST(Lexer, Parse_SingleIdentifierWithoutWhitespace_ReturnsSingleIdentiferTokenL
   auto tok = lexer.parse("xx");
   EXPECT_EQ(1, tok.size());
 }
+
+TEST(Lexer, Parse_Integer_ReturnsSingleIntegerLiteral) {
+  Lexer lexer;
+  auto tok = lexer.parse("99");
+  ASSERT_EQ(1, tok.size());
+  EXPECT_EQ(Token::Type::LITERAL_INTEGER, tok.front().type());
+}

@@ -26,6 +26,7 @@ public:
     COLON,
     TERMINATOR,
     RARROW,
+    LITERAL_INTEGER,
   };
   Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
