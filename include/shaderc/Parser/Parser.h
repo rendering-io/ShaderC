@@ -16,7 +16,12 @@ public:
   
 private:
   bool tokensRemaining() const;
-  bool isKeyword(const Token& token, const char* name) const;
+  bool isTokenType(const Token& token, Token::Type type) const;
+
+  template<typename... Types>
+  bool isTokenType(const Token& token, Token::Type type, Types... others) const {
+    return isTokenType(token, type) || isTokenType(token, others...);
+  }
 
   TranslationUnitPtr parseModule();
   GlobalDeclPtr parseGlobalDecl();
@@ -24,7 +29,7 @@ private:
   void parseParameterList();
   void parseFunctionBody();
 
-  Token consumeToken(Token::Type, const char* lexme);
+  Token consumeToken(Token::Type, const char* lexme = nullptr);
   Token consumeKeyword(const char* lexme);
   Token consumeIdentifier();
   Token consumeLParen();
