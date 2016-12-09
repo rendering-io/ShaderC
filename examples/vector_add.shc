@@ -1,0 +1,5 @@
+// A simple vector addition compute shader.
+cs vector_add(a: ssbo<f32>, b: ssbo<f32>, c: ssbo<f32>) {
+  let i = gid.x;
+  a[i] = b[i] + c[i];
+}

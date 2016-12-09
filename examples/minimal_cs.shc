@@ -1,0 +1,4 @@
+// A minimal compute shader, which actually does nothing.
+cs vector_add() {
+
+}
