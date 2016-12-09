@@ -20,8 +20,8 @@ Token& Parser::head() {
 	return tokens_->front();
 }
 
-bool Parser::isKeyword(const Token& token, const char* name) const {
-	return (token.type() == Token::Type::KEYWORD) && (name == token.lexme()); 
+bool Parser::isTokenType(const Token& token, Token::Type type) const {
+  return (token.type() == type); 
 }
 
 Token Parser::consumeToken(Token::Type type, const char* lexme) {
@@ -76,7 +76,14 @@ TranslationUnitPtr Parser::parseModule() {
 
 GlobalDeclPtr Parser::parseGlobalDecl() {
   Token& token = head();
-  if (isKeyword(token, "fn")) {
+  if (isTokenType(token, 
+                  Token::Type::FUNCTION_DECL, 
+                  Token::Type::COMPUTE_SHADER_DECL,
+                  Token::Type::VERTEX_SHADER_DECL,
+                  Token::Type::HULL_SHADER_DECL,
+                  Token::Type::DOMAIN_SHADER_DECL,
+                  Token::Type::GEOMETRY_SHADER_DECL,
+                  Token::Type::FRAGMENT_SHADER_DECL)) {
     return parseFunctionDecl();
   } else {
     // We found an unexpected and unsupported token.
@@ -85,8 +92,19 @@ GlobalDeclPtr Parser::parseGlobalDecl() {
 }
 
 FunctionDeclPtr Parser::parseFunctionDecl() {
-  // Require that the first token is 'fn' keyword.
-  consumeKeyword("fn");
+  // Require that the first token is a function or shader decl.
+  Token& decl = head();
+  if (!isTokenType(decl, 
+                   Token::Type::FUNCTION_DECL, 
+                   Token::Type::COMPUTE_SHADER_DECL,
+                   Token::Type::VERTEX_SHADER_DECL,
+                   Token::Type::HULL_SHADER_DECL,
+                   Token::Type::DOMAIN_SHADER_DECL,
+                   Token::Type::GEOMETRY_SHADER_DECL,
+                   Token::Type::FRAGMENT_SHADER_DECL))
+    throw ParseError{};
+
+  consumeToken(decl.type());
 
   // Get the function name.
   Token name = consumeIdentifier();

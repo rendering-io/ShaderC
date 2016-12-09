@@ -88,6 +88,9 @@ void CodeGeneratorImpl::visit(FunctionDecl& decl) {
   auto *func = Function::Create(funcType, GlobalValue::ExternalLinkage,
                                 decl.name(), *module_);
 
+  // Set the calling convention based on the shader type.
+  func->setCallingConv(1/*CallingConv::MaxID - 1*/);
+
   // Add a first basic block.
   BasicBlock* block = BasicBlock::Create(ctx, "entry", func);
   IRBuilder<> builder(block);

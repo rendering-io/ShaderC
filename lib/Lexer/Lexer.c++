@@ -14,6 +14,20 @@ std::ostream & operator<<(std::ostream &os, const Token& t) {
   case Token::Type::RBRACE:     typeStr = "RBRACE";     break;
   case Token::Type::LPAREN:     typeStr = "LPAREN";     break;
   case Token::Type::RPAREN:     typeStr = "RPAREN";     break;
+  case Token::Type::FUNCTION_DECL: 
+                                typeStr = "FUNCTION_DECL"; break;
+  case Token::Type::COMPUTE_SHADER_DECL:
+                                typeStr = "COMPUTE_SHADER_DECL"; break;
+  case Token::Type::VERTEX_SHADER_DECL:
+                                typeStr = "VERTEX_SHADER_DECL"; break;
+  case Token::Type::HULL_SHADER_DECL:
+                                typeStr = "HULL_SHADER_DECL"; break;
+  case Token::Type::DOMAIN_SHADER_DECL:
+                                typeStr = "DOMAIN_SHADER_DECL"; break;
+  case Token::Type::GEOMETRY_SHADER_DECL:
+                                typeStr = "GEOMETRY_SHADER_DECL"; break;
+  case Token::Type::FRAGMENT_SHADER_DECL:
+                                typeStr = "FRAGMENT_SHADER_DECL"; break;
   default:
     assert(false && "Unsupported token type.");
   }
@@ -25,21 +39,43 @@ std::ostream & operator<<(std::ostream &os, const Token& t) {
 
 using namespace shaderc;
 
+Lexer::Lexer() {
+  keywords_.emplace("fn", Token::Type::FUNCTION_DECL);
+  keywords_.emplace("cs", Token::Type::COMPUTE_SHADER_DECL);
+  keywords_.emplace("vs", Token::Type::VERTEX_SHADER_DECL);
+  keywords_.emplace("hs", Token::Type::HULL_SHADER_DECL);
+  keywords_.emplace("ds", Token::Type::DOMAIN_SHADER_DECL);
+  keywords_.emplace("gs", Token::Type::GEOMETRY_SHADER_DECL);
+  keywords_.emplace("fs", Token::Type::FRAGMENT_SHADER_DECL);
+}
+  
 void Lexer::reset(const char *input, size_t size) {
   head_ = input;
   end_ = input + size;
   parse_state_ = ParseState::INITIAL;
 }
 
-void Lexer::emitToken(TokenList& tokens, Token::Type type) {
+void Lexer::emitKeywordOrIdentifier(TokenList& tokens) {
   // Null terminate the lexme.
   lexme_.push_back(0);
 
-  // Hack 'fn' identifier into a keyword. This should be replaced by a proper
-  // symbol table.
-  if (Token::Type::IDENTIFIER == type &&
-      std::string("fn") == lexme_.data())
-    type = Token::Type::KEYWORD;
+  // Default to assuming the token is an identifer.
+  Token::Type type = Token::Type::IDENTIFIER;
+
+  // Look for our identifier in the reserved word list.
+  auto iter = keywords_.find(lexme_.data());
+  if (end(keywords_) != iter) {
+    // If we found the lexme then it's a reseved word, so use that type instead.
+    type = iter->second;
+  }
+  
+  // Now emit the token.
+  emitToken(tokens, type);
+}
+
+void Lexer::emitToken(TokenList& tokens, Token::Type type) {
+  // Null terminate the lexme.
+  lexme_.push_back(0);
   
   // Emit a token.
   tokens.emplace_back(type, lexme_.data());
@@ -135,7 +171,7 @@ Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
     // If the next character is not a valid in an identifier, then emit a 1 
     // character identifier.
     if (!isAlphabetic(n)) {
-      emitToken(tokens, Token::Type::IDENTIFIER);
+      emitKeywordOrIdentifier(tokens);
       return ParseState::INITIAL;   
     }
     return ParseState::IDENTIFIER;  
@@ -171,7 +207,7 @@ Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   // identifier. We should push the identifier to the token list and then 
   // return. We don't advance, because we need the invalid character to be 
   // consumed by a state that can handle it.
-  emitToken(tokens, Token::Type::IDENTIFIER);
+  emitKeywordOrIdentifier(tokens);
 
   return ParseState::INITIAL;
 }

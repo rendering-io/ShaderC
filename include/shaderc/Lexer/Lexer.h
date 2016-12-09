@@ -6,6 +6,7 @@
 #include <iostream>
 #include <list>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace shaderc {
@@ -27,6 +28,13 @@ public:
     TERMINATOR,
     RARROW,
     LITERAL_INTEGER,
+    FUNCTION_DECL,
+    COMPUTE_SHADER_DECL,
+    VERTEX_SHADER_DECL,
+    HULL_SHADER_DECL,
+    DOMAIN_SHADER_DECL,
+    GEOMETRY_SHADER_DECL,
+    FRAGMENT_SHADER_DECL,
   };
   Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
@@ -57,6 +65,8 @@ private:
     INVALID,
   };
 public:
+  Lexer();
+  
   // Parses an input string into a a sequence of words/tokens.
   TokenList parse(const std::string& in) { return parse(in.c_str(), in.size()); }
   TokenList parse(const char *in) { return parse(in, std::strlen(in)); }
@@ -89,6 +99,9 @@ private:
   char lookahead(size_t n = 1) { 
     return head_ + n < end_ ? *(head_ + n) : 0;
   }
+
+  // A map of keywords to tokens.
+  std::unordered_map<std::string, Token::Type> keywords_;
 
   // A buffer to accumulate the lexme into.
   std::vector<char> lexme_;
