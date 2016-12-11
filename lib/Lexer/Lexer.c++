@@ -47,6 +47,8 @@ Lexer::Lexer() {
   keywords_.emplace("ds", Token::Type::DOMAIN_SHADER_DECL);
   keywords_.emplace("gs", Token::Type::GEOMETRY_SHADER_DECL);
   keywords_.emplace("fs", Token::Type::FRAGMENT_SHADER_DECL);
+
+  keywords_.emplace("return", Token::Type::RETURN);
 }
   
 void Lexer::reset(const char *input, size_t size) {

@@ -36,6 +36,7 @@ public:
     GEOMETRY_SHADER_DECL,
     FRAGMENT_SHADER_DECL,
     TYPE_DECL,
+    RETURN,
   };
   Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
