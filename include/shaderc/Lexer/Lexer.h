@@ -35,6 +35,7 @@ public:
     DOMAIN_SHADER_DECL,
     GEOMETRY_SHADER_DECL,
     FRAGMENT_SHADER_DECL,
+    TYPE_DECL,
   };
   Token() : lexme_{}, type_{Type::INVALID} { }
   Token(Type type, std::string lexme) : lexme_{lexme}, type_{type} { }
@@ -66,7 +67,7 @@ private:
   };
 public:
   Lexer();
-  
+
   // Parses an input string into a a sequence of words/tokens.
   TokenList parse(const std::string& in) { return parse(in.c_str(), in.size()); }
   TokenList parse(const char *in) { return parse(in, std::strlen(in)); }
