@@ -75,6 +75,10 @@ void Lexer::emitKeywordOrIdentifier(TokenList& tokens) {
   emitToken(tokens, type);
 }
 
+void Lexer::emitIntegerLiteral(TokenList& tokens) {
+  emitToken(tokens, Token::Type::LITERAL_INTEGER);
+}
+
 void Lexer::emitToken(TokenList& tokens, Token::Type type) {
   // Null terminate the lexme.
   lexme_.push_back(0);
@@ -95,6 +99,10 @@ bool Lexer::consume(TokenList& tokens) {
   
   case ParseState::IDENTIFIER:
     next_state = consumeIdentifier(tokens);
+    break;
+
+  case ParseState::INTEGER:
+    next_state = consumeInteger(tokens);
     break;
   
   default:
@@ -164,6 +172,17 @@ Lexer::ParseState Lexer::consumeInitial(TokenList& tokens) {
     return ParseState::INITIAL;
   }
   
+  // If the character is a semicolon then emit terminator.
+  if (';' == c) {
+    emitToken(tokens, Token::Type::TERMINATOR);
+    advance(1);
+    return ParseState::INITIAL;
+  }
+
+  if (isNonZeroDigit(c)) {
+    return consumeInteger(tokens);
+  }
+
   // If the character is alphabetic, then we are starting a keyword or 
   // identifier.
   if (isAlphabetic(c)) {
@@ -214,6 +233,36 @@ Lexer::ParseState Lexer::consumeIdentifier(TokenList& tokens) {
   return ParseState::INITIAL;
 }
 
+// Consume the next character, assuming we are in the initial or integer parse
+// state.
+Lexer::ParseState Lexer::consumeInteger(TokenList& tokens) {
+  assert(ParseState::INITIAL == parse_state_ ||
+         ParseState::INTEGER == parse_state_ );
+
+  // Get the current and next character.
+  char c = head();
+  char n = lookahead(1);
+
+  assert(isDigit(c));
+  // If the character is alphabetic, then we are extending a keyword or 
+  // identifier.
+  lexme_.push_back(c);
+  advance(1);
+
+  // Now we lookahead to the next character. If its also a digit then we 
+  // continue parsing an integer.
+  if (isDigit(n))
+    return ParseState::INTEGER;  
+
+  // If we reach this point, then the lookahead character isn't valid in an
+  // integer. We should push the current integer to the token list and then 
+  // return. We don't advance, because we need the invalid character to be 
+  // consumed by a state that can handle it.
+  emitIntegerLiteral(tokens);
+
+  return ParseState::INITIAL;
+}
+
 bool Lexer::isAlphabetic(char c) const {
   return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
@@ -235,6 +284,10 @@ bool Lexer::isBracket(char c) const {
 
 bool Lexer::isDigit(char c) const {
   return ('0' <= c && c <= '9');
+}
+
+bool Lexer::isNonZeroDigit(char c) const {
+  return ('1' <= c && c <= '9');
 }
 
 bool Lexer::isWhitespace(char c) const {

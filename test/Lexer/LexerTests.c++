@@ -51,3 +51,12 @@ TEST(Lexer, Parse_Integer_ReturnsSingleIntegerLiteral) {
   ASSERT_EQ(1, tok.size());
   EXPECT_EQ(Token::Type::LITERAL_INTEGER, tok.front().type());
 }
+
+TEST(Lexer, Parse_IntegerSemiColon_ReturnsIntegerLiteralAndTerminator) {
+  Lexer lexer;
+  auto tok = lexer.parse("88;");
+  ASSERT_EQ(2, tok.size());
+  EXPECT_EQ(Token::Type::LITERAL_INTEGER, tok.front().type());
+  tok.pop_front();
+  EXPECT_EQ(Token::Type::TERMINATOR, tok.front().type());
+}

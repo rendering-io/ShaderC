@@ -62,6 +62,8 @@ private:
     INITIAL,
     // Parsing an identifier or keyword.
     IDENTIFIER,
+    // Parsing an integer literal.
+    INTEGER,
     // The parser has transitioned to the error state and we should abandon 
     // parsing
     INVALID,
@@ -79,7 +81,8 @@ private:
   bool consume(TokenList&);
   void emitToken(TokenList& tokens, Token::Type type);
   void emitKeywordOrIdentifier(TokenList& tokens);
-
+  void emitIntegerLiteral(TokenList& tokens);
+  
   // Consume the next character, assuming that it is a brace, bracket or 
   // parentheses.
   ParseState consumeBracket(TokenList&);
@@ -90,11 +93,14 @@ private:
   // Consume the next character, assuming we are in the identifier parse state.
   ParseState consumeIdentifier(TokenList&);
 
+  ParseState consumeInteger(TokenList&);
+
   bool done() { return head_ >= end_; };
   bool isLineEnding(char c) { return c == '\n' || c == '\r'; }
   bool isAlphabetic(char c) const;
   bool isBracket(char c) const;
   bool isDigit(char c) const;
+  bool isNonZeroDigit(char c) const;
   bool isWhitespace(char c) const;
   void reset(const char *input, size_t size);
   char head() { return *head_; }
