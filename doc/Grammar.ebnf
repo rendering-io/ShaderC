@@ -20,6 +20,10 @@ function
 parameter list
   = "(" , ")" ;
 
-(* For now, function bodies are always empty. *)
+(* Function bodies contain zero or more statements. *)
 function body
-  = "{" , "}" ;
+  = "{" , { statement }, "}" ;
+
+(* For now the only valid statement is to return a literal. *)
+statement
+  = "return", literal, ";" ;
